@@ -14,8 +14,7 @@ public class jwtUtil {
 
 
     //Here We Are Generating the Tokens Which use to be stored in cache
-    //so that the user can log in without any login credentials Until 24hrs
-
+    //so that the user can log in without any login credentials Until 2hr
     //later user need to login again with credentials so another token will be
     //generated again the process repeats by generating the token
 
@@ -37,12 +36,16 @@ public class jwtUtil {
     //their will an encoded version.
 
     public String getUsernameFromToken(String token) {
-        return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
+        return Jwts.parser()
+                .setSigningKey(jwtSecret)
+                .parseClaimsJws(token).getBody().getSubject();
     }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
+            Jwts.parser()
+                    .setSigningKey(jwtSecret)
+                    .parseClaimsJws(token);
             return true;
         } catch (Exception e) {
             return false;

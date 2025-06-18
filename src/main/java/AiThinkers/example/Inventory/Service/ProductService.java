@@ -16,7 +16,8 @@ public class ProductService {
 
     @Autowired
     private ProductRepository productRepo;
-    @Autowired private CategoryRepository categoryRepo;
+    @Autowired
+    private CategoryRepository categoryRepo;
 
     public List<Product> getAllProducts() {
         return productRepo.findAll();
@@ -46,4 +47,12 @@ public class ProductService {
         return ResponseEntity.ok("Product deleted successfully");
     }
 
+    public ResponseEntity<?> getProductById(Integer id) {
+        Optional<Product> productOpt = productRepo.findById(id);
+        if(productOpt.isPresent()){
+            return ResponseEntity.ok(productOpt.get());
+        }else{
+            return ResponseEntity.status(404).body("Product Not Found");
+        }
+    }
 }

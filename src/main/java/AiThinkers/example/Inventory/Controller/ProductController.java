@@ -21,11 +21,15 @@ public class ProductController {
     private ProductService productService;
 
     // Anyone logged in (admin or salesperson) can view products
-    @GetMapping
+    @GetMapping("/fetchAll")
     public List<Product> getAllProducts() {
         return productService.getAllProducts();
     }
 
+    @GetMapping("/fetch/{id}")
+    public ResponseEntity<?>  getProductById(@PathVariable Integer id){
+        return productService.getProductById(id);
+    }
     // Only admin can add a product
     @PostMapping("/add")
     public ResponseEntity<?> addProduct(@RequestBody Product product, Authentication authentication) {

@@ -33,13 +33,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
-        String jwt = null;
+        String jwtToken = null;
         String username = null;
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            jwt = authHeader.substring(7);
+            jwtToken = authHeader.substring(7);
             try {
-                username = jwtUtil.getUsernameFromToken(jwt);
+                username = jwtUtil.getUsernameFromToken(jwtToken);
             } catch (ExpiredJwtException e) {
                 logger.warn("JWT token is expired");
             } catch (Exception e) {
@@ -49,11 +49,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             Optional<User> userOpt = userRepo.findByEmail(username);
-            if (userOpt.isPresent() && jwtUtil.validateToken(jwt)) {
+            if (userOpt.isPresent() && jwtUtil.validateToken(jwtToken)) {
                 User user = userOpt.get();
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
                                 user, null, Collections.emptyList());
+                //in collections.emptylist was used to acesslevel to provide authorities
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }

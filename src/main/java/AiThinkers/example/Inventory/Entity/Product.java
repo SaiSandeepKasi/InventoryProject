@@ -14,7 +14,12 @@ public class Product {
 
     @Column(nullable = false, unique = true)
     private String name;
-
+/*@NotNull(message = "Price Should not be empty")
+    @NotEmpty(Message="Price should not be Empty")
+    we can also specify min and max price
+    @Min(Value=10)
+    @Max(Value=?)
+    */
     private Double price;
     private Integer stock;
 

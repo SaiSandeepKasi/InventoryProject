@@ -23,7 +23,6 @@ import java.util.Optional;
         @Autowired private RoleRepository roleRepo;
         @Autowired private BCryptPasswordEncoder passwordEncoder;
         @Autowired private jwtUtil jwtUtil;
-
         public ResponseEntity<?> registerUser(SignupRequest request) {
             if (userRepo.findByEmail(request.getEmail()).isPresent() ||
                     userRepo.findByMobile(request.getMobile()).isPresent()) {
