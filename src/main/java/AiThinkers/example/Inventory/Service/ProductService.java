@@ -3,6 +3,8 @@ package AiThinkers.example.Inventory.Service;
 
 
 import AiThinkers.example.Inventory.Entity.*;
+import AiThinkers.example.Inventory.Model.BuyProductRequest;
+import AiThinkers.example.Inventory.Model.BuyProductRespone;
 import AiThinkers.example.Inventory.Repo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,8 @@ public class ProductService {
     private ProductRepository productRepo;
     @Autowired
     private CategoryRepository categoryRepo;
+    @Autowired
+    private CustomerRepository customerRepo;
 
     public List<Product> getAllProducts() {
         return productRepo.findAll();
@@ -54,5 +58,49 @@ public class ProductService {
         }else{
             return ResponseEntity.status(404).body("Product Not Found");
         }
+    }
+
+    public ResponseEntity<?> buyProduct(BuyProductRequest request) {
+        //Finding the Product by name and category if provided
+        Optional<Product> productOpt;
+        if (request.getProductName() != null && !request.getCategoryName().isEmpty()) {
+
+            //Finding by Category name in DB
+            Optional<Category> categoryOpt = categoryRepo.findByName(request.getCategoryName());
+            if (categoryOpt.isEmpty()) {
+                return ResponseEntity.badRequest().body("Category Not Found");
+            }
+            //Finding by product & category or by product name id in DB
+            productOpt = productRepo.findByNameAndCategory(request.getProductName(), categoryOpt.get());
+        } else {
+            productOpt = productRepo.findByName(request.getProductName());
+        }
+        if (productOpt.isEmpty()) {
+            return ResponseEntity.badRequest().body("Prduct Not Found");
+        }
+
+        //Finding Customer id in DB
+        Optional<Customer> customerOpt = customerRepo.findById(request.getCustomerId());
+        if (customerOpt.isEmpty()) {
+            return ResponseEntity.badRequest().body("Customer Not Found");
+        }
+
+        Product product = productOpt.get();
+        if (product.getStock() < request.getQuantity()) {
+            return ResponseEntity.badRequest().body("Not enough stock available");
+        }
+
+        //This will set the product Quantity to current stock
+        product.setStock(product.getStock() - request.getQuantity());
+        productRepo.save(product);
+
+        BuyProductRespone respone = new BuyProductRespone(
+                product.getName(),
+                product.getCategory().getName(),
+                request.getQuantity(),
+                product.getStock(),
+                "Purchase was Successfully Done !!"
+        );
+        return ResponseEntity.ok(respone);
     }
 }

@@ -5,6 +5,7 @@ package AiThinkers.example.Inventory.Controller;
 
 import AiThinkers.example.Inventory.Entity.Product;
 import AiThinkers.example.Inventory.Entity.User;
+import AiThinkers.example.Inventory.Model.BuyProductRequest;
 import AiThinkers.example.Inventory.Service.ProductService;
 import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,11 @@ public class ProductController {
     public ResponseEntity<?> deleteProduct(@PathVariable Integer id, Authentication authentication) {
         User user = (User) authentication.getPrincipal();
         return productService.deleteProduct(id, user);
+    }
+
+    @PostMapping("/buy")
+    public ResponseEntity<?> buyProduct(@RequestBody BuyProductRequest request){
+        return productService.buyProduct(request);
     }
 
 }
