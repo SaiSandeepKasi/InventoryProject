@@ -5,6 +5,7 @@ package AiThinkers.example.Inventory.Service;
 import AiThinkers.example.Inventory.Entity.*;
 import AiThinkers.example.Inventory.Model.BuyProductRequest;
 import AiThinkers.example.Inventory.Model.BuyProductRespone;
+import AiThinkers.example.Inventory.Model.ProductPatchRequest;
 import AiThinkers.example.Inventory.Repo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -102,5 +103,61 @@ public class ProductService {
                 "Purchase was Successfully Done !!"
         );
         return ResponseEntity.ok(respone);
+    }
+
+    public ResponseEntity<?> patchUpdateByProductId(Integer id, ProductPatchRequest patchRequest, User user) {
+        if(!user.getRole().getName().equals("ADMIN")){
+            return ResponseEntity.status(400).body("Only Admin can Update the products");
+        }
+
+        Optional<Product> productOpt = productRepo.findById(id);
+        if(productOpt.isEmpty()){
+            return ResponseEntity.status(404).body("Product not Found By the Given Id");
+        }
+
+        Product product = productOpt.get();
+
+        if(patchRequest.getName() != null)
+            product.setName(patchRequest.getName());
+        if(patchRequest.getPrice() != null)
+            product.setPrice(patchRequest.getPrice());
+        if(patchRequest.getStock() != null)
+            product.setStock(patchRequest.getStock());
+        if(patchRequest.getCategoryId() != null){
+            Optional<Category> categoryOpt = categoryRepo.findById(patchRequest.getCategoryId());
+            if(categoryOpt.isEmpty()){
+                return ResponseEntity.badRequest().body("Category was found through the given Id ,Check the Id");
+            }
+            product.setCategory(categoryOpt.get());
+        }
+        productRepo.save(product);
+        return ResponseEntity.ok(product);
+    }
+
+    public ResponseEntity<?> patchUpdateByProductName(String name, ProductPatchRequest patchRequest, User user) {
+        if(!user.getRole().getName().equals("ADMIN")){
+            return ResponseEntity.status(400).body("Only Admin can update the products");
+        }
+        Optional<Product> productOpt = productRepo.findByName(name);
+        if(productOpt.isEmpty()){
+            return ResponseEntity.status(404).body("Product was not found with the given product name");
+        }
+        Product product = productOpt.get();
+
+        if(patchRequest.getName() != null)
+            product.setName(patchRequest.getName());
+        if(patchRequest.getPrice() != null)
+            product.setPrice(patchRequest.getPrice());
+        if(patchRequest.getStock() != null)
+            product.setStock(patchRequest.getStock());
+        if(patchRequest.getCategoryId() != null){
+            Optional<Category> categoryOpt = categoryRepo.findById(patchRequest.getCategoryId());
+            if(categoryOpt.isEmpty()){
+                return ResponseEntity.badRequest().body("Category was found through the given Id ,Check the Id");
+            }
+            product.setCategory(categoryOpt.get());
+        }
+        productRepo.save(product);
+        return ResponseEntity.ok(product);
     }
 }
