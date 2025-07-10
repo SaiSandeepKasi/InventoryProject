@@ -1,15 +1,19 @@
 package AiThinkers.example.Inventory.Security;
 
 
+import AiThinkers.example.Inventory.Entity.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class jwtUtil {
-    private final String jwtSecret = "iamusingthisanmysuperSecretKeyheretooverthesecretkeyKeySizementionedintheconsolewhereitshouldbelongerandmorelongerhere"; // Use env variable in prod!
+    private final String jwtSecret = "fhgghcvkjbgjhukgyifhgfhgvghguguy6757t769656587tiupgig087r67tr87gph78870hgpuih89hy87y87n87y78t68hb"; // Use env variable in prod!
     private final long jwtExpirationMs = 2 * 60 * 60 * 1000; //  2-Hours
 
 
@@ -19,14 +23,21 @@ public class jwtUtil {
     //generated again the process repeats by generating the token
 
     //here the subject was the Userdetails it verify the token and token contain userEmail/phoneno
-    public String generateToken(String Userdetails) {
+    public String generateToken(User user) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", user.getRole().getName());
+        claims.put("userId", user.getId());
+        // Add more claims if you want
+
         return Jwts.builder()
-                .setSubject(Userdetails)
+                .setClaims(claims)
+                .setSubject(user.getEmail()) // This is the "sub" claim
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
+
 
     //claims here are claiming the user details that true to login by token
 

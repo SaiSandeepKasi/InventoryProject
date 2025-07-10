@@ -3,10 +3,12 @@ package AiThinkers.example.Inventory.Security;
 
 import AiThinkers.example.Inventory.Entity.User;
 import AiThinkers.example.Inventory.Repo.UserRepository;
+import AiThinkers.example.Inventory.Service.CustomUserDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -24,6 +26,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     private jwtUtil jwtUtil;
+
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
 
     @Autowired
     private UserRepository userRepo;
@@ -48,14 +53,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            Optional<User> userOpt = userRepo.findByEmail(username);
-            if (userOpt.isPresent() && jwtUtil.validateToken(jwtToken)) {
-                User user = userOpt.get();
+            UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+            if ( jwtUtil.validateToken(jwtToken)) {
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
-                                user, null, Collections.emptyList());
-                //in collections.emptylist was used to acesslevel to provide authorities
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                                userDetails,  null, userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
