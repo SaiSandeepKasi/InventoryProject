@@ -1,4 +1,4 @@
-/*package AiThinkers.example.Inventory;
+package AiThinkers.example.Inventory;
 
 import AiThinkers.example.Inventory.Entity.*;
 import AiThinkers.example.Inventory.Repo.*;
@@ -20,10 +20,11 @@ public class DataInitializer {
         return args -> {
             // Add roles
             if (roleRepo.findByName("ADMIN").isEmpty())
-                roleRepo.save(new Role(1,"ADMIN"));
+                roleRepo.save(new Role(1, "ADMIN"));
             if (roleRepo.findByName("SALESPERSON").isEmpty())
-                roleRepo.save(new Role(2,"SALESPERSON"));
-
+                roleRepo.save(new Role(2, "SALESPERSON"));
+        };
+/*
             // Add categories
             String[] categories = { "Mobiles", "Audio", "Accessories", "Laptops", "Televisions" };
             for (String cat : categories) {
@@ -45,5 +46,6 @@ public class DataInitializer {
             }
         };
     }
-}
 */
+        }
+    }
